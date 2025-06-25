@@ -56,7 +56,7 @@ const userschema=new mongoose.Schema(
     {email:{type:String,required:true},
     password:{type:String,required:true}}
 );
-const usermodel=mongoose.model("USER",userschema)
+const usermodel=mongoose.model("users",userschema)
 
 app.post('/register',async(req,res,next)=>
 {
@@ -84,7 +84,7 @@ app.post('/login',(req,res)=>
     .then((userdata)=>
     {
         console.log(userdata);
-        const data={email:userdata.email,password:userdata.password}
+        const data={_id:userdata._id,email:userdata.email,password:userdata.password}
         const token=generateaccesstoken(data);
         const refreshtoken=generaterefreshtoken(data);
         refereshtoken.push(refreshtoken);
@@ -107,8 +107,13 @@ app.post('/verifyjwt',verifyToken,(req,res)=>
 //*todoschema and model
 
 const todoschema=new mongoose.Schema(
-    {datetime:{type:Date},title:{type:String},description:{type:String},status:{type:String},userId: { type: mongoose.Schema.Types.ObjectId, ref: 'USER' }}
+    {datetime:{type:Date},
+    title:{type:String},
+    description:{type:String},
+    status:{type:String},
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'users' }}
 );
+const todomodel = mongoose.model("Todo", todoschema);
 
 //-------
 
@@ -119,12 +124,12 @@ app.post("/addtask",verifyToken,(req,res)=>
     const {title} =req.body;
     const {description} =req.body;
     const {status} =req.body; */
-    const todomodel=new mongoose.model(usertododb,todoschema)
-    todomodel.create(req.body)
+    //const todomodel=new mongoose.model(usertododb,todoschema)
+    todomodel.create({...req.body,userId: req.user._id})
     .then((datatask)=>
     {
         res.send("VALUE INSERTED SUCCESFULLY")
-        console.log(datatask._id);
+        console.log(datatask.userId);
     })
     .catch((err)=>
     {
@@ -135,7 +140,6 @@ app.post("/addtask",verifyToken,(req,res)=>
 
 app.post("/viewall",verifyToken,(req,res)=>
 {
-    const todomodel=new mongoose.model(usertododb,todoschema)
     todomodel.find({userId: req.user._id})
     .then((alltask)=>
     {
@@ -148,12 +152,12 @@ app.post("/viewall",verifyToken,(req,res)=>
     })
 });
 
-app.delete("/delete",(req,res)=>
+app.delete("/delete",verifyToken,(req,res)=>
 {
-    const todomodel=new mongoose.model(usertododb,todoschema)
+    //const todomodel=new mongoose.model(usertododb,todoschema)
     const {description}=req.body;
     todomodel.findOneAndDelete({
-        description:description
+        userId: req.user._id,description:description
     })
     .then(()=>
     {
