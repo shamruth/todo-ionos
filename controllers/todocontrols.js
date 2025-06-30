@@ -31,20 +31,35 @@ exports.deleteone=async(req,res)=>
     {
         const delete_task=await todomodel.findOneAndDelete({
             userId: req.user._id,
-            description: req.body.description,
+            _id: req.body._id
         });
         if(delete_task)
         {
-            res.send("TASK_DELETED");
+            res.status(200).send("TASK_DELETED");
         }
         else
         {
-            res.send("TASK NOT DELETED");
+            res.status(500).send("TASK NOT DELETED");
         }
     }
     catch(err)
     {
         console.log(err);
         res.status(500).send("SERVER ERROR");
+    }
+}
+exports.status=async(req,res)=>
+{
+    try
+    {
+        const status=await todomodel.findOneAndUpdate({userId:req.user._id,_id:req.body._id},{status:req.body.status});
+        if(status)
+        {
+            res.status(200).send("STATUS CHANGED SUCCESSFULL")
+        }
+    }
+    catch(err)
+    {
+        res.status(500).send("AN ERROR ARRISED");
     }
 }

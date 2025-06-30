@@ -4,5 +4,6 @@ const todocont=require("../controllers/todocontrols");
 const verifytoken=require("../middleware/verifyToken");
 router.post("/addtask",verifytoken,todocont.addtasks);
 router.get("/viewall",verifytoken,todocont.viewall);
-router.delete("/delete",verifytoken,todocont.deleteone);  
+router.delete("/delete",verifytoken,todocont.deleteone);
+router.put("/statuschange",verifytoken,todocont.status);
 module.exports=router;
