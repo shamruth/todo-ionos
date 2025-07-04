@@ -52,7 +52,7 @@ exports.status=async(req,res)=>
 {
     try
     {
-        const status=await todomodel.findOneAndUpdate({userId:req.user._id,_id:req.body._id},{status:req.body.status});
+        const status=await todomodel.findOneAndUpdate({_id:req.body._id},{status:req.body.status});
         if(status)
         {
             res.status(200).send("STATUS CHANGED SUCCESSFULL")
